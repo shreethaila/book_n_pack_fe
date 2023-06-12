@@ -94,7 +94,7 @@ function AddSch() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                alert("Travel Schedule added");
             })
             .catch(error => {
                 console.error(error);

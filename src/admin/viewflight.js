@@ -45,7 +45,7 @@ function ViewFlight() {
         fetch(`${baseurl}/flight/remove/${e.target.name}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'applicat,ion/json',
+                'Content-Type': 'application/json',
             },
             credentials: 'include'
         })

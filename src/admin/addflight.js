@@ -46,10 +46,12 @@ function AddFlight() {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
+               alert("Flight Added");
             })
             .catch(error => {
                 console.error(error);
             });
+        
     }
     return (
         <Form onSubmit={submitflight}>
