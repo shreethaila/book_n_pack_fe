@@ -1,2 +1,2 @@
-const baseurl='https://book-n-pack-shreethaila.vercel.app/api'
+const baseurl='/api'
 export default baseurl;
