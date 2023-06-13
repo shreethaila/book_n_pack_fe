@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://book-n-pack-shreethaila.vercel.app/api/:path*"
+            "destination": "https://book-n-pack-fe-git-shreethaila-patch-1-shreethaila.vercel.app/api/:path*"
         }
     ]
 }
