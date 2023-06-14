@@ -11,7 +11,7 @@ function AddSch() {
 
     const [schData, setSchData] = useState(
         {
-            'aid': 1,
+            'aid': 101,
             'fid': 0,
             'source': '',
             'destination': '',
@@ -24,11 +24,12 @@ function AddSch() {
         }
     );
     const handleAirlineChange = async (event) => {
-        console.log(event.target.value)
         setSchData({
             ...schData,
             [event.target.name]: event.target.value,
         });
+
+        console.log(event.target.value);
 
         flightdata(event.target.value);
     };
@@ -47,7 +48,11 @@ function AddSch() {
                 credentials: 'include'
             }
         ).then((response) => response.json());
-        setallAirline(response.data);
+        await setallAirline(response.data);
+        await setSchData({
+            ...schData,
+            aid: response.data[0].aid
+        });
 
     }
     const flightdata = async (aid) => {
@@ -57,18 +62,19 @@ function AddSch() {
                 credentials: 'include'
             }
         ).then((response) => response.json());
+        console.log(response.data)
         setallFlights(response.data);
         setSchData({
             ...schData,
             "fid": response.data[0].fid,
         });
-        console.log(response.data)
+        
     }
     useEffect(() => {
         getAirline();
         flightdata(schData.aid);
     }, []);
-
+    
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = date.getMonth() + 1; // Months are zero-based, so add 1
@@ -94,7 +100,7 @@ function AddSch() {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                alert("Travel Schedule added");
             })
             .catch(error => {
                 console.error(error);
@@ -133,24 +139,24 @@ function AddSch() {
         <Form onSubmit={submitSch}>
             <Form.Group>
                 <Form.Label>Airline</Form.Label>
-                <Form.Select name='aid' onChange={handleAirlineChange}>
+                <Form.Select name='aid' onChange={handleAirlineChange} required>
                     {
                         allAirline.map((airline) => (
-                            <option value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
+                            <option value={airline.aid} key={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
                         ))
                     }
                 </Form.Select>
                 <br />
                 <Form.Label>Flight Number</Form.Label>
-                <Form.Select name='fid' onChange={handleChange}>
+                <Form.Select name='fid' onChange={handleChange} required>
                     {getflights()}
                 </Form.Select>
                 <br />
                 <Form.Label>Source</Form.Label>
-                <Form.Control type="text" placeholder="Source" name="source" value={schData.source} onChange={handleChange} />
+                <Form.Control type="text" placeholder="Source" name="source" value={schData.source} onChange={handleChange} required/>
                 <br />
                 <Form.Label>Destination</Form.Label>
-                <Form.Control type="text" placeholder="Destination" name="destination" value={schData.destination} onChange={handleChange} />
+                <Form.Control type="text" placeholder="Destination" name="destination" value={schData.destination} onChange={handleChange} required/>
                 <br />
                 <Form.Label>Estimated Arrival Time</Form.Label>
                 <Form.Control
@@ -158,6 +164,7 @@ function AddSch() {
                     value={schData.est_arrival_time}
                     name="est_arrival_time"
                     onChange={handleChange}
+                    required
                 />
                 <br />
                 <Form.Label>Depature Time</Form.Label>
@@ -166,10 +173,11 @@ function AddSch() {
                     value={schData.depature_time}
                     name="depature_time"
                     onChange={handleChange}
+                    required
                 />
                 <br />
                 <Form.Label>Fare</Form.Label>
-                <Form.Control type="number" placeholder="Fare" name="fare" value={schData.fare} onChange={handleChange} />
+                <Form.Control type="number" placeholder="Fare" name="fare" value={schData.fare} onChange={handleChange} required/>
                 <br />
                 <Form.Label>Starts From</Form.Label>
                 <DatePicker

@@ -9,6 +9,7 @@ function ViewFlight() {
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
     const [airline, setairline] = useState(1);
+    const [searchDone, setSearchDone] = useState(false);
     const getFlight = async () => {
         const response = await fetch(
             `${baseurl}/flight/getflight?aid=` + airline,
@@ -23,8 +24,8 @@ function ViewFlight() {
     const getApiData = async () => {
         const response = await fetch(
             `${baseurl}/flight/getairline`, {
-                credentials: 'include'
-            }
+            credentials: 'include'
+        }
         ).then((response) => response.json());
         setallAirline(response.data);
     }
@@ -38,6 +39,7 @@ function ViewFlight() {
     const submitSch = (e) => {
         e.preventDefault();
         getFlight();
+        setSearchDone(true)
     }
 
     const removeflight = (e) => {
@@ -45,22 +47,21 @@ function ViewFlight() {
         fetch(`${baseurl}/flight/remove/${e.target.name}`, {
             method: 'DELETE',
             headers: {
-                'Content-Type': 'applicat,ion/json',
+                'Content-Type': 'application/json',
             },
             credentials: 'include'
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
+            .then(response => {
+                alert("Flight Removed");
                 // let tempflights=[...flights]
-    //         // tempflights[index].status='removed';
-    //         // setflights(tempflights)
+                //         // tempflights[index].status='removed';
+                //         // setflights(tempflights)
             })
             .catch(error => {
                 console.error(error);
             });
     }
-    
+
     return (
         <div>
             <Form onSubmit={submitSch}>
@@ -77,32 +78,42 @@ function ViewFlight() {
                     <Button variant="primary" type="submit">Submit</Button>
                 </Form.Group>
             </Form>
+            <div>
+                {flights.length === 0 ? (
+                    searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No flights found in this airline!</h5></div>) : (<div />)
+                ) : (
+                    <div>
+                        <br></br>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Flight Number</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
 
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Flight Number</th>
-                        <th>Capacity</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    flights.map((flight, index) => (
+                                        <tr key={flight.fid}>
+                                            <td>{`${flight.flightnumber}`}</td>
+                                            <td>{`${flight.capacity}`}</td>
+                                            <td>{`${flight.status}`}</td>
+                                            <td><Button variant="warning" name={flight.fid} id={flight.fid} size="sm" onClick={removeflight}>
+                                                Remove
+                                            </Button></td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </Table>
+                    </div>
+                )}
+            </div>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        flights.map((flight,index) => (
-                            <tr key={flight.fid}>
-                                <td>{`${flight.flightnumber}`}</td>
-                                <td>{`${flight.capacity}`}</td>
-                                <td>{`${flight.status}`}</td>
-                                <td><Button variant="warning" name={flight.fid} id = {flight.fid} size="sm" onClick={removeflight}>
-                                    Remove
-                                </Button></td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </Table>
+
         </div>
     )
 }

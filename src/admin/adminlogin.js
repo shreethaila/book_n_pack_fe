@@ -93,7 +93,6 @@ const Login = () => {
                                 <Col> <Button variant="primary" type="submit">
                                     Login
                                 </Button></Col>
-                                <Col><a href="">SignUp</a></Col>
                             </Row>
                         </Container>
 

@@ -1,15 +1,17 @@
 import Form from 'react-bootstrap/Form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { Button } from 'react-bootstrap';
 import baseurl from '../config';
 function TextControlsExample() {
+
     const [ticketData, setTicketData] = useState({
         passengersCount: ''
     });
 
+    const [occ_seats, setocc_seats] = useState(0);
     const [passengerCountDisabled, setPassengerCountDisabled] = useState(false);
-
+    const [formFailure, setFormFailure] = useState(0);
     const [passengerData, setPassengerData] = useState([]);
 
     const onChange = (event) => {
@@ -19,9 +21,28 @@ function TextControlsExample() {
         });
     };
 
-    const addPassengers = () => {
+    const addPassengers = async () => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const schId = queryParams.get('schid');
+        const response = await fetch(`${baseurl}/booking/occseats/${schId}`, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        }).then((response) => response.json());
+        console.log(response.data[0].occ_seats);
+        await setocc_seats(response.data[0].occ_seats);
+        console.log(occ_seats);
+        const errors = await validateFormFields(response.data[0].occ_seats);
+        if (errors && Object.keys(errors).length > 0) {
+            setFormFailure(errors);
+        } else {
+        setFormFailure('');
         renderPassengerInputs(ticketData.passengersCount)
         setPassengerCountDisabled(true)
+        }
+        
+
     }
 
     const renderPassengerInputs = (count) => {
@@ -70,38 +91,52 @@ function TextControlsExample() {
             </div>
         ));
     };
+    const validateFormFields = (occ) => {
 
+        let errors;
+        console.log(occ);
+        if ((60 - occ) < ticketData.passengersCount) {
+            errors = `${ticketData.passengersCount} seats not available`
+        }
+
+        return errors;
+    }
 
     const submitticketbooking = (e) => {
         e.preventDefault();
-        const queryParams = new URLSearchParams(window.location.search);
-        const schId = queryParams.get('schid');
-        //api
-        fetch(`${baseurl}/booking/book`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ schid: schId, booked_seats: ticketData.passengersCount })
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert("Ticket Booked");
-                    window.location.replace('/mybookings');
-                } else {
-                    alert("Ticket Booking failed!!")
-                }
+        
+
+            const queryParams = new URLSearchParams(window.location.search);
+            const schId = queryParams.get('schid');
+            //api
+            fetch(`${baseurl}/booking/book`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ schid: schId, booked_seats: ticketData.passengersCount ,passenger:passengerData})
             })
-            .catch(error => {
-                console.error(error);
-            });
+                .then(response => {
+                    if (response.ok) {
+                        alert("Ticket Booked");
+                        window.location.replace('/mybookings');
+                    } else {
+                        alert("Ticket Booking failed!!")
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
     }
     return (
         <Form onSubmit={submitticketbooking}>
             <Form.Group className="mb-3">
                 <Form.Label>Number of seats</Form.Label>
-                <Form.Control type="number" name="passengersCount" value={ticketData.passengersCount} onChange={onChange} disabled={passengerCountDisabled} required />
+                <Form.Control type="number" name="passengersCount" value={ticketData.passengersCount} onChange={onChange} disabled={passengerCountDisabled} isInvalid={formFailure} required />
+                <Form.Control.Feedback type="invalid">
+                    {formFailure}
+                </Form.Control.Feedback>
             </Form.Group>
             <ListGroup as="ul">
                 {renderInputFields()}

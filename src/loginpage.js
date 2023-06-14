@@ -34,9 +34,20 @@ const Login = () => {
                 credentials: 'include',
                 body: JSON.stringify(loginData)
             }).then(response => {
+                console.log(response.headers)
+                console.log(response.headers['Cache-Control'])
                 if(response.ok) {
+                    // Access the response headers
+    const headers = response.headers;
+
+    // Get the value of a specific header
+    const customHeader = headers.get('Userloggedin');
+
+
+    // Log the header value
+    console.log(customHeader);
                 console.log("Logged In successfully!!")
-                window.location.replace('/')
+               window.location.replace('/')
                 } else {
                     alert("Login failed")
                 }

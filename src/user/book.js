@@ -13,13 +13,14 @@ import TicketForm from './ticketform';
 import Modal from 'react-bootstrap/Modal';
 export default function BookTicket() {
     const [tickets, setTickets] = useState([]);
+    const [searchDone, setSearchDone] = useState(false);
     const [searchData, setSearchData] = useState({
         source: '',
         destination: '',
         date: ''
     });
     const bookpage = (event) => {
-        window.location.replace('/ticketbook?schid='+event.target.name);
+        window.location.replace('/ticketbook?schid=' + event.target.name);
     }
     const getApiData = async () => {
 
@@ -54,6 +55,7 @@ export default function BookTicket() {
     const handlesubmit = (event) => {
         event.preventDefault();
         console.log("heere");
+        setSearchDone(true);
         getApiData();
     }
     const [date, setDate] = useState(null);
@@ -73,11 +75,11 @@ export default function BookTicket() {
                         <Row>
                             <Col>
                                 <Form.Control type="text" placeholder="Source" name="source" onChange={handlechange}
-                                    value={searchData.source} required/>
+                                    value={searchData.source} required />
                             </Col>
                             <Col>
                                 <Form.Control type="text" placeholder="Destination" name="destination" onChange={handlechange}
-                                    value={searchData.destination} required/>
+                                    value={searchData.destination} required />
                             </Col>
                             <Col xs={6} md={3}>
                                 <DatePicker
@@ -95,45 +97,56 @@ export default function BookTicket() {
                 </Form.Group>
             </Form>
 
+            <div>
+                {tickets.length === 0 ? (
+                    searchDone ? (<div><br/><h5 style={{ textAlign: 'center' }}>No flights found!</h5><p style={{ textAlign: 'center' }}>Please try a different route or date</p></div>) : (<div/>)
+                ) : (
+                    <div>
+                        <br></br>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Airline Name</th>
+                                    <th>Flight Number</th>
+                                    <th>Source</th>
+                                    <th>Destination</th>
+                                    <th>Date</th>
+                                    <th>Arrival Time</th>
+                                    <th>Depature Time</th>
+                                    <th>Available Seats</th>
+                                    <th>Fare</th>
+                                    <th>Book</th>
 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    tickets.map((ticket) => (
+                                        <tr key={ticket.schid}>
+                                            <td>{`${ticket.airlinename}`}</td>
+                                            <td>{`${ticket.flightnumber}`}</td>
+                                            <td>{`${ticket.source}`}</td>
+                                            <td>{`${ticket.destination}`}</td>
+                                            <td>{`${ticket.schdate}`}</td>
+                                            <td>{`${ticket.est_arrival_time}`}</td>
+                                            <td>{`${ticket.depature_time}`}</td>
+                                            <td>{`${ticket.aseats}`}</td>
+                                            <td>{`${ticket.fare}`}</td>
+                                            <td><Button variant="primary" name={ticket.schid} id="bookBut" size="sm" onClick={bookpage}>
+                                                Book
+                                            </Button></td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </Table>
+                    </div>
+                )}
+            </div>
 
 
             <br></br>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Airline Name</th>
-                        <th>Flight Number</th>
-                        <th>Source</th>
-                        <th>Destination</th>
-                        <th>Date</th>
-                        <th>Arrival Time</th>
-                        <th>Depature Time</th>
-                        <th>Fare</th>
-                        <th>Book</th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        tickets.map((ticket) => (
-                            <tr key={ticket.schid}>
-                                <td>{`${ticket.airlinename}`}</td>
-                                <td>{`${ticket.flightnumber}`}</td>
-                                <td>{`${ticket.source}`}</td>
-                                <td>{`${ticket.destination}`}</td>
-                                <td>{`${ticket.sch_date}`}</td>
-                                <td>{`${ticket.est_arrival_time}`}</td>
-                                <td>{`${ticket.depature_time}`}</td>
-                                <td>{`${ticket.fare}`}</td>
-                                <td><Button variant="primary" name={ticket.schid} id = "bookBut" size="sm" onClick={bookpage}>
-                                    Book
-                                </Button></td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </Table>
         </div>
+
     )
 }
