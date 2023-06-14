@@ -1,2 +1,2 @@
-const baseurl='http://localhost:3000/api'
+const baseurl='/api'
 export default baseurl;
