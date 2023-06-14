@@ -3,9 +3,10 @@ import { Form } from 'react-bootstrap';
 import baseurl from '../config';
 import Button from 'react-bootstrap/Button';
 function AddFlight() {
+    const [formFailure, setFormFailure] = useState('');
     const [flightData, setFlightData] = useState(
         {
-            'aid': 1,
+            'aid': 0,
             'flightnumber': 0,
             'capacity': 0
         }
@@ -13,6 +14,7 @@ function AddFlight() {
     const [allAirline, setallAirline] = useState([]);
     const handleChange = (event) => {
         console.log(event.target.value)
+
         setFlightData({
             ...flightData,
             [event.target.name]: event.target.value,
@@ -26,41 +28,70 @@ function AddFlight() {
             }
         ).then((response) => response.json());
         setallAirline(response.data);
+        setFlightData({
+            ...flightData,
+            aid: response.data[0].aid
+        })
 
     }
     useEffect(() => {
         getApiData();
     }, []);
+    const validateFormFields = async () => {
+        let errors;
+        const response = await fetch(
+            `${baseurl}/flight/getflight?aid=` + flightData.aid,
+            {
+                credentials: 'include'
+            }
+        ).then((response) => response.json());
+        let array=response.data;
+        console.log(array);
+        const found = array.some(obj => obj.flightnumber == flightData.flightnumber);
+        console.log(found);
+        if (found) {
+            errors = "Flight already exists";
+        }else{
+            errors='';
+        }
 
-    const submitflight = (event) => {
+        return errors;
+    }
+    const submitflight = async (event) => {
         event.preventDefault();
-        console.log(flightData);
-        fetch(`${baseurl}/flight/addflight`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify(flightData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-               alert("Flight Added");
+        const errors = await validateFormFields();
+        if (errors && Object.keys(errors).length > 0) {
+            console.log("error");
+            setFormFailure(errors);
+        } else {
+            console.log(flightData);
+            fetch(`${baseurl}/flight/addflight`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(flightData)
             })
-            .catch(error => {
-                console.error(error);
-            });
-        
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert("Flight Added");
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
     }
     return (
         <Form onSubmit={submitflight}>
             <Form.Group>
                 <Form.Label>Airline</Form.Label>
-                <Form.Select name='aid' onChange={handleChange}>
+                <Form.Select name='aid' onChange={handleChange} value={flightData.aid} required>
                     {
                         allAirline.map((airline) => (
-                            <option value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
+                            <option key={airline.aid} value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
                         ))
                     }
                 </Form.Select>
@@ -72,7 +103,12 @@ function AddFlight() {
                     value={flightData.fn}
                     onChange={handleChange}
                     placeholder="Enter Flight Number"
+                    isInvalid={formFailure}
+                    required
                 />
+                <Form.Control.Feedback type="invalid">
+                                    {formFailure}
+                                </Form.Control.Feedback>
                 <br></br>
                 <Form.Label>Passenger Occupancy</Form.Label>
                 <Form.Control
@@ -81,6 +117,7 @@ function AddFlight() {
                     value={flightData.occupancy}
                     onChange={handleChange}
                     placeholder="Enter Capacity"
+                    required
                 />
                 <br></br>
                 <Button variant="primary" type="submit">Submit</Button>

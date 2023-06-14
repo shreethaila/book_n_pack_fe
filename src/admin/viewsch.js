@@ -9,8 +9,9 @@ import DatePicker from 'react-datepicker';
 function ViewBooking() {
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
-    const [airline, setairline] = useState(1);
+    const [airline, setairline] = useState(101);
     const [allFlights, setallFlights] = useState([]);
+    const [searchDone, setSearchDone] = useState(false);
     const [searchData, setSearchData] = useState({
         fid: '',
         date: ''
@@ -29,16 +30,16 @@ function ViewBooking() {
     const getApiData = async () => {
         const response = await fetch(
             `${baseurl}/flight/getairline`, {
-                credentials: 'include'
-            }
+            credentials: 'include'
+        }
         ).then((response) => response.json());
         setallAirline(response.data);
     }
     const getAirline = async () => {
         const response = await fetch(
             `${baseurl}/flight/getairline`, {
-                credentials: 'include'
-            }
+            credentials: 'include'
+        }
         ).then((response) => response.json());
         setallAirline(response.data);
 
@@ -51,8 +52,8 @@ function ViewBooking() {
     const flightdata = async (aid) => {
         const response = await fetch(
             `${baseurl}/flight/getflight?aid=` + aid, {
-                credentials: 'include'
-            }
+            credentials: 'include'
+        }
         ).then((response) => response.json());
         setallFlights(response.data);
         setSearchData({
@@ -89,24 +90,25 @@ function ViewBooking() {
             "date": date
         });
     }
-    const [bookings,setBookings]=useState([]);
+    const [bookings, setBookings] = useState([]);
     const onSubmit = async (e) => {
         e.preventDefault();
         console.log(searchData)
-        const date=searchData.date;
+        const date = searchData.date;
         const year = date.getFullYear();
         const month = date.getMonth() + 1; // Months are zero-based, so add 1
         const day = date.getDate();
         const formattedDate = year + "-" + month + "-" + day;
         console.log("formattedDate" + formattedDate);
-        const response=await fetch(`${baseurl}/booking/getbookings?fn=${searchData.fid}&date=${formattedDate}`, {
+        const response = await fetch(`${baseurl}/booking/getbookings?fn=${searchData.fid}&date=${formattedDate}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
             credentials: 'include'
         })
-        .then(response => response.json());
+            .then(response => response.json());
         setBookings(response.data);
+        setSearchDone(true);
     }
 
     const removeflight = (e) => {
@@ -146,7 +148,7 @@ function ViewBooking() {
                     <Form.Select name='fid' onChange={handleChange}>
                         {getflights()}
                     </Form.Select>
-                    <br /><br/>
+                    <br />
                     <Form.Label>Date</Form.Label>
                     <DatePicker
                         selected={searchData.date}
@@ -156,47 +158,59 @@ function ViewBooking() {
                         className="form-control"
                         required
                     />
+                    <br/>
+                    <br/>
                     <Button variant="primary" type="submit">Submit</Button>
                 </Form.Group>
             </Form>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Airline Name</th>
-                        <th>Flight Number</th>
-                        <th>Source</th>
-                        <th>Destination</th>
-                        <th>Date</th>
-                        <th>Arrival Time</th>
-                        <th>Depature Time</th>
-                        <th>Booked Seats</th>
-                        <th>Total amount</th>
-                        <th>Date of Booking</th>
-                        <th>Status</th>
+            <div>
+                {bookings.length === 0 ? (
+                    searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No Bookings found!</h5></div>) : (<div />)
+                ) : (
+                    <div>
+                        <br></br>
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Airline Name</th>
+                                    <th>Flight Number</th>
+                                    <th>Source</th>
+                                    <th>Destination</th>
+                                    <th>Date</th>
+                                    <th>Arrival Time</th>
+                                    <th>Depature Time</th>
+                                    <th>Booked Seats</th>
+                                    <th>Total amount</th>
+                                    <th>Date of Booking</th>
+                                    <th>Status</th>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        bookings.map((booking) => (
-                            <tr key={booking.bid}>
-                                <td>{`${booking.airlinename}`}</td>
-                                <td>{`${booking.flightnumber}`}</td>
-                                <td>{`${booking.source}`}</td>
-                                <td>{`${booking.destination}`}</td>
-                                <td>{`${booking.sch_date}`}</td>
-                                <td>{`${booking.est_arrival_time}`}</td>
-                                <td>{`${booking.depature_time}`}</td>
-                                <td>{`${booking.booked_seats}`}</td>
-                                <td>{`${booking.totalamt}`}</td>
-                                <td>{`${booking.dateofbooking}`}</td>
-                                <td>{`${booking.status}`}</td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </Table>
-            
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    bookings.map((booking) => (
+                                        <tr key={booking.bid}>
+                                            <td>{`${booking.airlinename}`}</td>
+                                            <td>{`${booking.flightnumber}`}</td>
+                                            <td>{`${booking.source}`}</td>
+                                            <td>{`${booking.destination}`}</td>
+                                            <td>{`${booking.schdate}`}</td>
+                                            <td>{`${booking.est_arrival_time}`}</td>
+                                            <td>{`${booking.depature_time}`}</td>
+                                            <td>{`${booking.booked_seats}`}</td>
+                                            <td>{`${booking.totalamt}`}</td>
+                                            <td>{`${booking.dateofbooking}`}</td>
+                                            <td>{`${booking.status}`}</td>
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </Table>
+                    </div>
+                )}
+            </div>
+
+
         </div>
     )
 }
