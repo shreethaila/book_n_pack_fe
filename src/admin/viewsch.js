@@ -2,7 +2,7 @@ import React from 'react';
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
 import baseurl from '../config';
-import { Form } from 'react-bootstrap';
+import { Container, Form,Row,Col } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 
@@ -94,12 +94,18 @@ function ViewBooking() {
     const onSubmit = async (e) => {
         e.preventDefault();
         console.log(searchData)
-        const date = searchData.date;
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // Months are zero-based, so add 1
-        const day = date.getDate();
-        const formattedDate = year + "-" + month + "-" + day;
-        console.log("formattedDate" + formattedDate);
+        let formattedDate;
+        if (searchData.date != "") {
+            const date = searchData.date;
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1; // Months are zero-based, so add 1
+            const day = date.getDate();
+            formattedDate = year + "-" + month + "-" + day;
+            console.log("formattedDate" + formattedDate);
+        } else {
+            formattedDate = null
+        }
+
         const response = await fetch(`${baseurl}/booking/getbookings?fn=${searchData.fid}&date=${formattedDate}`, {
             headers: {
                 'Content-Type': 'application/json',
@@ -111,58 +117,48 @@ function ViewBooking() {
         setSearchDone(true);
     }
 
-    const removeflight = (e) => {
-
-        fetch(`${baseurl}/flight/remove/${e.target.name}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // let tempflights=[...flights]
-                //         // tempflights[index].status='removed';
-                //         // setflights(tempflights)
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
-
+    const today = new Date();
+    const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return (
         <div>
-            <Form onSubmit={onSubmit} >
-                <Form.Group>
-                    <Form.Label>Airline</Form.Label>
-                    <Form.Select name='aid' onChange={handleAirlineChange}>
-                        {
-                            allAirline.map((airline) => (
-                                <option value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
-                            ))
-                        }
-                    </Form.Select>
-                    <br />
-                    <Form.Label>Flight Number</Form.Label>
-                    <Form.Select name='fid' onChange={handleChange}>
-                        {getflights()}
-                    </Form.Select>
-                    <br />
-                    <Form.Label>Date</Form.Label>
-                    <DatePicker
-                        selected={searchData.date}
-                        onChange={handleStDate}
-                        dateFormat="yyyy-MM-dd"
-                        placeholderText="Scheduled Date"
-                        className="form-control"
-                        required
-                    />
-                    <br/>
-                    <br/>
-                    <Button variant="primary" type="submit">Submit</Button>
-                </Form.Group>
-            </Form>
+            <br></br>
+            <Container>
+                <Row className="justify-content-center">
+                    <Col xs={12} sm={8} md={6} lg={4} >
+                        <Form onSubmit={onSubmit} >
+                            <Form.Group>
+                                <Form.Label>Airline</Form.Label>
+                                <Form.Select name='aid' onChange={handleAirlineChange}>
+                                    {
+                                        allAirline.map((airline) => (
+                                            <option value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
+                                        ))
+                                    }
+                                </Form.Select>
+                                <br />
+                                <Form.Label>Flight Number</Form.Label>
+                                <Form.Select name='fid' onChange={handleChange}>
+                                    {getflights()}
+                                </Form.Select>
+                                <br />
+                                <Form.Label>Date</Form.Label>
+                                <DatePicker
+                                    minDate={minDate}
+                                    selected={searchData.date}
+                                    onChange={handleStDate}
+                                    dateFormat="yyyy-MM-dd"
+                                    placeholderText="Scheduled Date"
+                                    className="form-control"
+                                />
+                                <br />
+                                <br />
+                                <Button variant="primary" type="submit">Submit</Button>
+                            </Form.Group>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
+
             <div>
                 {bookings.length === 0 ? (
                     searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No Bookings found!</h5></div>) : (<div />)
@@ -172,6 +168,7 @@ function ViewBooking() {
                         <Table striped bordered hover>
                             <thead>
                                 <tr>
+                                    <th>User Email</th>
                                     <th>Airline Name</th>
                                     <th>Flight Number</th>
                                     <th>Source</th>
@@ -180,7 +177,6 @@ function ViewBooking() {
                                     <th>Arrival Time</th>
                                     <th>Depature Time</th>
                                     <th>Booked Seats</th>
-                                    <th>Total amount</th>
                                     <th>Date of Booking</th>
                                     <th>Status</th>
 
@@ -190,6 +186,7 @@ function ViewBooking() {
                                 {
                                     bookings.map((booking) => (
                                         <tr key={booking.bid}>
+                                            <td>{`${booking.email}`}</td>
                                             <td>{`${booking.airlinename}`}</td>
                                             <td>{`${booking.flightnumber}`}</td>
                                             <td>{`${booking.source}`}</td>
@@ -198,7 +195,6 @@ function ViewBooking() {
                                             <td>{`${booking.est_arrival_time}`}</td>
                                             <td>{`${booking.depature_time}`}</td>
                                             <td>{`${booking.booked_seats}`}</td>
-                                            <td>{`${booking.totalamt}`}</td>
                                             <td>{`${booking.dateofbooking}`}</td>
                                             <td>{`${booking.status}`}</td>
                                         </tr>

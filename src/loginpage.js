@@ -36,18 +36,18 @@ const Login = () => {
             }).then(response => {
                 console.log(response.headers)
                 console.log(response.headers['Cache-Control'])
-                if(response.ok) {
+                if (response.ok) {
                     // Access the response headers
-    const headers = response.headers;
+                    const headers = response.headers;
 
-    // Get the value of a specific header
-    const customHeader = headers.get('Userloggedin');
+                    // Get the value of a specific header
+                    const customHeader = headers.get('Userloggedin');
 
 
-    // Log the header value
-    console.log(customHeader);
-                console.log("Logged In successfully!!")
-               window.location.replace('/')
+                    // Log the header value
+                    console.log(customHeader);
+                    console.log("Logged In successfully!!")
+                    window.location.replace('/')
                 } else {
                     alert("Login failed")
                 }
@@ -60,12 +60,33 @@ const Login = () => {
     const validateFormFields = () => {
         let errors = {};
 
-        if(!loginData.email) {
+        if (!loginData.email) {
             errors.email = "Email cannot be empty"
         }
 
-        if(!loginData.password) {
+        if (!loginData.password) {
             errors.password = "Password cannot be empty"
+        }
+        const uppercaseRegExp = /(?=.*?[A-Z])/;
+        const lowercaseRegExp = /(?=.*?[a-z])/;
+        const digitsRegExp = /(?=.*?[0-9])/;
+        const specialCharRegExp = /(?=.*?[#?!@$%^&*-])/;
+        const minLengthRegExp = /.{8,}/;
+        const uppercasePassword = uppercaseRegExp.test(loginData.password);
+        const lowercasePassword = lowercaseRegExp.test(loginData.password);
+        const digitsPassword = digitsRegExp.test(loginData.password);
+        const specialCharPassword = specialCharRegExp.test(loginData.password);
+        const minLengthPassword = minLengthRegExp.test(loginData.password);
+        if (!uppercasePassword) {
+            errors.password = "At least one Uppercase";
+        } else if (!lowercasePassword) {
+            errors.password = "At least one Lowercase";
+        } else if (!digitsPassword) {
+            errors.password = "At least one digit";
+        } else if (!specialCharPassword) {
+            errors.password = "At least one Special Characters";
+        } else if (!minLengthPassword) {
+            errors.password = "At least minumum 8 characters";
         }
 
         return errors;
@@ -84,7 +105,7 @@ const Login = () => {
                             </Form.Label>
                             <Col sm="12">
                                 <Form.Control type="email" name="email" placeholder="Email" value={loginData.email}
-                                    onChange={onChange}  isInvalid={formFailure.email}/>
+                                    onChange={onChange} isInvalid={formFailure.email} />
                                 <Form.Control.Feedback type="invalid">
                                     {formFailure.email}
                                 </Form.Control.Feedback>

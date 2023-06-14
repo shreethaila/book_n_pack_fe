@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form ,Container,Row,Col} from 'react-bootstrap';
 import baseurl from '../config';
 import Button from 'react-bootstrap/Button';
 function AddFlight() {
@@ -13,6 +13,7 @@ function AddFlight() {
     );
     const [allAirline, setallAirline] = useState([]);
     const handleChange = (event) => {
+        setFormFailure('');
         console.log(event.target.value)
 
         setFlightData({
@@ -45,14 +46,14 @@ function AddFlight() {
                 credentials: 'include'
             }
         ).then((response) => response.json());
-        let array=response.data;
+        let array = response.data;
         console.log(array);
         const found = array.some(obj => obj.flightnumber == flightData.flightnumber);
         console.log(found);
         if (found) {
             errors = "Flight already exists";
-        }else{
-            errors='';
+        } else {
+            errors = '';
         }
 
         return errors;
@@ -64,6 +65,7 @@ function AddFlight() {
             console.log("error");
             setFormFailure(errors);
         } else {
+            setFormFailure(errors);
             console.log(flightData);
             fetch(`${baseurl}/flight/addflight`, {
                 method: 'POST',
@@ -77,6 +79,7 @@ function AddFlight() {
                 .then(data => {
                     console.log(data);
                     alert("Flight Added");
+                    window.location.replace('/addflight');
                 })
                 .catch(error => {
                     console.error(error);
@@ -85,45 +88,56 @@ function AddFlight() {
 
     }
     return (
-        <Form onSubmit={submitflight}>
-            <Form.Group>
-                <Form.Label>Airline</Form.Label>
-                <Form.Select name='aid' onChange={handleChange} value={flightData.aid} required>
-                    {
-                        allAirline.map((airline) => (
-                            <option key={airline.aid} value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
-                        ))
-                    }
-                </Form.Select>
-                <br></br>
-                <Form.Label>Flight Number</Form.Label>
-                <Form.Control
-                    name='flightnumber'
-                    type="number"
-                    value={flightData.fn}
-                    onChange={handleChange}
-                    placeholder="Enter Flight Number"
-                    isInvalid={formFailure}
-                    required
-                />
-                <Form.Control.Feedback type="invalid">
-                                    {formFailure}
-                                </Form.Control.Feedback>
-                <br></br>
-                <Form.Label>Passenger Occupancy</Form.Label>
-                <Form.Control
-                    name='capacity'
-                    type="number"
-                    value={flightData.occupancy}
-                    onChange={handleChange}
-                    placeholder="Enter Capacity"
-                    required
-                />
-                <br></br>
-                <Button variant="primary" type="submit">Submit</Button>
+        <div>
+            <br></br>
+       
+        <Container>
+            <Row className="justify-content-center">
+                <Col xs={12} sm={8} md={6} lg={4}>
+                    <Form onSubmit={submitflight}>
+                        <Form.Group>
+                            <Form.Label>Airline</Form.Label>
+                            <Form.Select name='aid' onChange={handleChange} value={flightData.aid} required>
+                                {
+                                    allAirline.map((airline) => (
+                                        <option key={airline.aid} value={airline.aid}><img src={airline.logo} width={10} height={10}></img>{`${airline.airlinename}`}</option>
+                                    ))
+                                }
+                            </Form.Select>
+                            <br></br>
+                            <Form.Label>Flight Number</Form.Label>
+                            <Form.Control
+                                name='flightnumber'
+                                type="number"
+                                value={flightData.fn}
+                                onChange={handleChange}
+                                placeholder="Enter Flight Number"
+                                isInvalid={formFailure}
+                                required
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {formFailure}
+                            </Form.Control.Feedback>
+                            <br></br>
+                            <Form.Label>Passenger Occupancy</Form.Label>
+                            <Form.Control
+                                name='capacity'
+                                type="number"
+                                value={flightData.occupancy}
+                                onChange={handleChange}
+                                placeholder="Enter Capacity"
+                                required
+                            />
+                            <br></br>
+                            <Button variant="primary" type="submit" >Submit</Button>
 
-            </Form.Group>
-        </Form>
+                        </Form.Group>
+                    </Form>
+                </Col>
+            </Row>
+        </Container>
+        </div>
+
     );
 };
 
