@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Form ,Container,Row,Col} from 'react-bootstrap';
 import baseurl from '../config';
 import Button from 'react-bootstrap/Button';
+import '../index.css'
 function AddFlight() {
     const [formFailure, setFormFailure] = useState('');
     const [flightData, setFlightData] = useState(
         {
             'aid': 0,
             'flightnumber': 0,
-            'capacity': 0
+            'focc': 0,
+            'bocc':0,
+            'eocc':0
         }
     );
     const [allAirline, setallAirline] = useState([]);
@@ -88,7 +91,7 @@ function AddFlight() {
 
     }
     return (
-        <div>
+        <div class='flightcont'>
             <br></br>
        
         <Container>
@@ -113,23 +116,47 @@ function AddFlight() {
                                 onChange={handleChange}
                                 placeholder="Enter Flight Number"
                                 isInvalid={formFailure}
+                                min="0"
                                 required
                             />
                             <Form.Control.Feedback type="invalid">
                                 {formFailure}
                             </Form.Control.Feedback>
                             <br></br>
-                            <Form.Label>Passenger Occupancy</Form.Label>
+                            <Form.Label>First Class Occupancy</Form.Label>
                             <Form.Control
-                                name='capacity'
+                                name='focc'
                                 type="number"
-                                value={flightData.occupancy}
+                                value={flightData.focc}
                                 onChange={handleChange}
                                 placeholder="Enter Capacity"
+                                min="0"
                                 required
                             />
                             <br></br>
-                            <Button variant="primary" type="submit" >Submit</Button>
+                            <Form.Label>Business Class Occupancy</Form.Label>
+                            <Form.Control
+                                name='bocc'
+                                type="number"
+                                value={flightData.bocc}
+                                onChange={handleChange}
+                                placeholder="Enter Capacity"
+                                min="0"
+                                required
+                            />
+                            <br></br>
+                            <Form.Label>Economy Class Occupancy</Form.Label>
+                            <Form.Control
+                                name='eocc'
+                                type="number"
+                                value={flightData.eocc}
+                                onChange={handleChange}
+                                placeholder="Enter Capacity"
+                                min="0"
+                                required
+                            />
+                            <br></br>
+                            <Button variant="primary" type="submit" style={{background:"#009999"}}>Submit</Button>
 
                         </Form.Group>
                     </Form>

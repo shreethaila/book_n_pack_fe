@@ -4,10 +4,12 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import { Button, Col, Container, Row } from 'react-bootstrap';
 import baseurl from '../config';
 import Modal from 'react-bootstrap/Modal';
+import '../index.css'
 function TextControlsExample() {
 
     const [ticketData, setTicketData] = useState({
         passengersCount: '',
+        seattype: 'f',
         fare: 0,
         amount: 0
     });
@@ -17,7 +19,7 @@ function TextControlsExample() {
     const [passengerCountDisabled, setPassengerCountDisabled] = useState(false);
     const [formFailure, setFormFailure] = useState(0);
     const [passengerData, setPassengerData] = useState([]);
-
+    const [seat, setseat] = useState(0);
     const onChange = (event) => {
         setTicketData({
             ...ticketData,
@@ -28,36 +30,43 @@ function TextControlsExample() {
     const addPassengers = async () => {
         const queryParams = new URLSearchParams(window.location.search);
         const schId = queryParams.get('schid');
-        const response = await fetch(`${baseurl}/booking/occseats/${schId}`, {
+        const response = await fetch(`${baseurl}/booking/occseats/${schId}/${ticketData.seattype}`, {
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include'
         }).then((response) => response.json());
         console.log(response.data[0].occ_seats);
-        await setocc_seats(response.data[0].occ_seats);
-        console.log(occ_seats);
-        const errors = await validateFormFields(response.data[0].occ_seats);
+        let errors;
+        if (ticketData.seattype == 'f') {
+            errors = await validateFormFields(response.data[0].focc, response.data[0].occ_seats);
+        } else if (ticketData.seattype == 'b') {
+            errors = await validateFormFields(response.data[0].bocc, response.data[0].occ_seats);
+        } else if (ticketData.seattype == 'e') {
+            errors = await validateFormFields(response.data[0].eocc, response.data[0].occ_seats);
+        }
         if (errors && Object.keys(errors).length > 0) {
             setFormFailure(errors);
         } else {
             setFormFailure('');
-            renderPassengerInputs(ticketData.passengersCount)
+            renderPassengerInputs(ticketData.passengersCount, response.data[0].occ_seats)
             setPassengerCountDisabled(true)
         }
 
 
     }
 
-    const renderPassengerInputs = (count) => {
+    const renderPassengerInputs = async (count, startseat) => {
         const inp = [];
         for (let i = 0; i < count; i++) {
+            startseat++;
             inp[i] = {
                 name: '',
                 age: '',
                 gender: 'male',
                 proof_type: '',
-                proof_id: ''
+                proof_id: '',
+                seatno: ticketData.seattype+startseat
             }
         }
         setPassengerData(inp)
@@ -67,10 +76,9 @@ function TextControlsExample() {
         const values = [...passengerData];
         values[index] = {
             ...values[index],
-            [event.target.name]: event.target.value
+            [event.target.name]: event.target.value,
         };
         setPassengerData(values);
-
         console.log(values)
     };
 
@@ -83,13 +91,13 @@ function TextControlsExample() {
                         <Form.Label>Name</Form.Label>
                         <Form.Control type="text" name="name" value={input.name} onChange={(event) => handleInputChange(index, event)} required />
                         <Form.Label>Age</Form.Label>
-                        <Form.Control type="number" name="age" value={input.age} onChange={(event) => handleInputChange(index, event)} required />
+                        <Form.Control type="number" name="age" min="0" value={input.age} onChange={(event) => handleInputChange(index, event)} required />
                         <Form.Label>Gender</Form.Label>
                         {/* <Form.Control type="text" name="gender" value={input.gender} onChange={(event) => handleInputChange(index, event)} required /> */}
                         <Form.Select name='gender' value={input.gender} onChange={(event) => handleInputChange(index, event)} required>
-                        <option value='male'>Male</option>
-                        <option value='female' >Female</option>
-                        <option value='other'>Other</option>
+                            <option value='male'>Male</option>
+                            <option value='female' >Female</option>
+                            <option value='other'>Other</option>
                         </Form.Select>
                         <Form.Label>Proof Type</Form.Label>
                         <Form.Control type="text" name="proof_type" value={input.proof_type} onChange={(event) => handleInputChange(index, event)} required />
@@ -101,14 +109,13 @@ function TextControlsExample() {
             </div>
         ));
     };
-    const validateFormFields = (occ) => {
+    const validateFormFields = (total, occ) => {
 
         let errors;
         console.log(occ);
-        if ((60 - occ) < ticketData.passengersCount) {
+        if ((total - occ) < ticketData.passengersCount) {
             errors = `${ticketData.passengersCount} seats not available`
         }
-
         return errors;
     }
     const [show, setShow] = useState(false);
@@ -127,12 +134,31 @@ function TextControlsExample() {
                 credentials: 'include'
             }
         ).then((response) => response.json());
-        console.log(response.data[0].fare);
-        setTicketData(prevTicketData => ({
-            ...prevTicketData,
-            fare: parseFloat(response.data[0].fare).toFixed(2),
-            amount: (parseFloat(prevTicketData.passengersCount) * parseFloat(response.data[0].fare)).toFixed(2)
-        }));
+        if (ticketData.seattype == 'f') {
+            console.log(response.data[0].firstclass);
+            setTicketData(prevTicketData => ({
+                ...prevTicketData,
+                fare: parseFloat(response.data[0].firstclass).toFixed(2),
+                amount: (parseFloat(prevTicketData.passengersCount) * parseFloat(response.data[0].firstclass)).toFixed(2)
+            }));
+        } else if (ticketData.seattype == 'b') {
+            console.log(response.data[0].businessclass);
+            setTicketData(prevTicketData => ({
+                ...prevTicketData,
+                fare: parseFloat(response.data[0].businessclass).toFixed(2),
+                amount: (parseFloat(prevTicketData.passengersCount) * parseFloat(response.data[0].businessclass)).toFixed(2)
+            }));
+
+        } else if (ticketData.seattype == 'e') {
+            console.log(response.data[0].economyclass);
+            setTicketData(prevTicketData => ({
+                ...prevTicketData,
+                fare: parseFloat(response.data[0].economyclass).toFixed(2),
+                amount: (parseFloat(prevTicketData.passengersCount) * parseFloat(response.data[0].economyclass)).toFixed(2)
+            }));
+
+        }
+        handleShow();
 
 
         console.log("submitticketbooking");
@@ -144,14 +170,13 @@ function TextControlsExample() {
     const pay = (e) => {
         const queryParams = new URLSearchParams(window.location.search);
         const schId = queryParams.get('schid');
-        //api
         fetch(`${baseurl}/booking/book`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify({ schid: schId, booked_seats: ticketData.passengersCount, passenger: passengerData })
+            body: JSON.stringify({ schid: schId, booked_seats: ticketData.passengersCount,seattype:ticketData.seattype,totalamount:ticketData.amount, passenger: passengerData })
         })
             .then(response => {
                 if (response.ok) {
@@ -166,14 +191,23 @@ function TextControlsExample() {
             });
     }
     return (
-        <div>
+        <div class='cont'>
             <Container>
                 <Row className="justify-content-center">
                     <Col xs={12} sm={8} md={6} lg={4}>
                         <Form onSubmit={submitticketbooking}>
+
                             <Form.Group className="mb-3">
+                                <br></br>
+                                <Form.Label>Seat Type</Form.Label>
+                                <Form.Select name='seattype' value={ticketData.seattype} onChange={onChange} disabled={passengerCountDisabled} required>
+                                    <option value='f'>First Class</option>
+                                    <option value='b' >Business Class</option>
+                                    <option value='e'>Economy Class</option>
+                                </Form.Select>
+                                <br />
                                 <Form.Label>Number of seats</Form.Label>
-                                <Form.Control type="number" name="passengersCount" value={ticketData.passengersCount} onChange={onChange} disabled={passengerCountDisabled} isInvalid={formFailure} required />
+                                <Form.Control type="number" min="1" name="passengersCount" value={ticketData.passengersCount} onChange={onChange} disabled={passengerCountDisabled} isInvalid={formFailure} required />
                                 <Form.Control.Feedback type="invalid">
                                     {formFailure}
                                 </Form.Control.Feedback>
@@ -183,8 +217,8 @@ function TextControlsExample() {
                             </ListGroup>
                             {
                                 (passengerCountDisabled) ?
-                                    <Button variant="primary" type="submit" onClick={handleShow}>Book</Button>
-                                    : <Button variant="primary" onClick={addPassengers}>Add passengers</Button>
+                                    <Button variant="primary" type="submit" style={{ background: "#009999" }}>Book</Button>
+                                    : <Button variant="primary" onClick={addPassengers} style={{ background: "#009999" }}>Add passengers</Button>
                             }
                         </Form>
                     </Col>
@@ -210,10 +244,10 @@ function TextControlsExample() {
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={handleClose} style={{ background: "#009999" }}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={pay}>
+                    <Button variant="primary" onClick={pay} style={{ background: "#009999" }}>
                         Pay
                     </Button>
                 </Modal.Footer>

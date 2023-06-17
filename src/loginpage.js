@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
-
+import './index.css'
 
 const Login = () => {
     const [loginData, setLoginData] = useState({
@@ -94,9 +94,14 @@ const Login = () => {
 
 
     return (
+        <div class='cont'>
         <Container>
+            <br></br>
+            <br></br>
+            <br></br>
             <Row className="justify-content-md-center">
-                <Col md="auto">
+                <Col md="auto" style={{background:"white" ,borderRadius: '10px', 
+        padding: '10px' }}>
                     <h1>Login</h1>
                     <Form onSubmit={onSubmit}>
                         <Form.Group as={Row} className="mb-3">
@@ -126,7 +131,7 @@ const Login = () => {
                         </Form.Group>
                         <Container>
                             <Row>
-                                <Col> <Button variant="primary" type="submit">
+                                <Col> <Button type="submit" style={{background:"#009999"}}>
                                     Login
                                 </Button></Col>
                                 <Col><a href="/signup">SignUp</a></Col>
@@ -138,6 +143,7 @@ const Login = () => {
             </Row>
 
         </Container>
+        </div>
 
     );
 }

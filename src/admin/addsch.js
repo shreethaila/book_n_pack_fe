@@ -4,6 +4,7 @@ import baseurl from '../config';
 import Button from 'react-bootstrap/Button';
 import TimePicker from 'react-time-picker';
 import DatePicker from 'react-datepicker';
+import '../index.css'
 function AddSch() {
 
     const [allAirline, setallAirline] = useState([]);
@@ -20,7 +21,9 @@ function AddSch() {
             'stdate': '',
             'enddate': '',
             'schdate': '',
-            'fare': 0
+            'firstclass': 0,
+            'businessclass':0,
+            'economyclass':0
         }
     );
     const handleAirlineChange = async (event) => {
@@ -138,7 +141,7 @@ function AddSch() {
     const today = new Date();
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return (
-        <div>
+        <div class='flightcont'>
         <br></br>
         <Container>
             <Row className="justify-content-center">
@@ -183,9 +186,15 @@ function AddSch() {
                                 required
                             />
                             <br />
-                            <Form.Label>Fare</Form.Label>
-                            <Form.Control type="number" placeholder="Fare" name="fare" value={schData.fare} onChange={handleChange} required />
+                            <Form.Label>First Class Fare</Form.Label>
+                            <Form.Control type="number" placeholder="Fare" name="firstclass" min="0" value={schData.firstclass} onChange={handleChange} required />
                             <br />
+                            <Form.Label>Business Class Fare</Form.Label>
+                            <Form.Control type="number" placeholder="Fare" name="businessclass" min="0" value={schData.businessclass} onChange={handleChange} required />
+                            <br/>
+                            <Form.Label>Economy Class Fare</Form.Label>
+                            <Form.Control type="number" placeholder="Fare" name="economyclass" min="0" value={schData.economyclass} onChange={handleChange} required />
+                            <br/>
                             <Form.Label>Starts From</Form.Label>
                             <DatePicker
                                 minDate={minDate}
@@ -209,7 +218,7 @@ function AddSch() {
                             />
                             <br />
                             <br />
-                            <Button variant="primary" type="submit">Submit</Button>
+                            <Button variant="primary" type="submit" style={{background:"#009999"}}>Submit</Button>
 
                         </Form.Group>
                     </Form>

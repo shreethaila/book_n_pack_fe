@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Form, FormGroup, FormControl, Dropdown,Col,Container,Row } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import baseurl from './config';
+import './index.css'
 function SignUp() {
   const [formFailure, setFormFailure] = useState('');
   const [signUpValues, setSignUpValues] = useState(
@@ -13,7 +14,8 @@ function SignUp() {
       password: '',
       conPassword: '',
       phoneno: '',
-      address: ''
+      address: '',
+      usertype:'user'
     }
   );
 
@@ -121,11 +123,12 @@ function SignUp() {
 
 
   return (
-    <div>
+    <div class='cont'>
     <br></br>
     <Container>
       <Row className="justify-content-center">
-        <Col xs={12} sm={8} md={6} lg={4}>
+        <Col xs={12} sm={8} md={6} lg={4} style={{background:"white" ,borderRadius: '10px', 
+        padding: '10px' }}>
         <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
         <Form.Label>First Name</Form.Label>
@@ -183,7 +186,7 @@ function SignUp() {
         </Form.Control.Feedback>
         </Col>
       </Form.Group>
-      <Button type="submit">Sign Up</Button>
+      <Button type="submit" style={{background:"#009999"}} >Sign Up</Button>
     </Form>
         </Col>
       </Row>

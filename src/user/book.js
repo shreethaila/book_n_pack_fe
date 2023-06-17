@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Form } from 'react-bootstrap';
+import '../index.css'
 import TicketForm from './ticketform';
 import Modal from 'react-bootstrap/Modal';
 export default function BookTicket() {
@@ -46,11 +47,12 @@ export default function BookTicket() {
             <td>{`${item.schdate}`}</td>
             <td>{`${item.est_arrival_time}`}</td>
             <td>{`${item.depature_time}`}</td>
-            <td>{`${item.aseats}`}</td>
-            <td>{`${item.fare}`}</td>
-            {item.aseats == 0 ? (<td><Button variant="primary" disabled="true" name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
+            <td><b><i>{`First Class`}</i></b>{`-${item.frem}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.brem}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.erem}`}</td>
+            <td><b><i>{`First Class`}</i></b>{`-${item.firstclass}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.businessclass}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.economyclass}`}</td>
+
+            {item.aseats == 0 ? (<td><Button variant="primary" disabled="true" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
                 Book
-            </Button></td>) : (<td><Button variant="primary" name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
+            </Button></td>) : (<td><Button variant="primary" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
                 Book
             </Button></td>)}
 
@@ -118,7 +120,7 @@ export default function BookTicket() {
     const today = new Date();
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return (
-        <div>
+        <div class='cont'>
             <br>
             </br>
 
@@ -146,7 +148,7 @@ export default function BookTicket() {
                                     className="form-control"
                                 />
                             </Col>
-                            <Col><Button type="submit">Search</Button></Col>
+                            <Col><Button type="submit" style={{background:"#009999"}}>Search</Button></Col>
                         </Row>
                     </Container>
                 </Form.Group>
@@ -157,7 +159,7 @@ export default function BookTicket() {
                     searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No flights found!</h5><p style={{ textAlign: 'center' }}>Please try a different route or date</p></div>) : (
                         <div>
                             <br />
-                            <Table striped bordered hover>
+                            <Table striped bordered hover responsive>
                                 <thead>
                                     <tr>
                                         <th>Airline Name</th>
@@ -181,14 +183,15 @@ export default function BookTicket() {
                             </Table>
                             <Button
                                 onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1} // Disable the button if already on the first page
+                                disabled={currentPage === 1} style={{background:"#009999"}} // Disable the button if already on the first page
                             >
                                 Previous
                             </Button>
                             {currentPage}/{totalPages}
                             <Button
                                 onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages} // Disable the button if already on the last page
+                                disabled={currentPage === totalPages}
+                                style={{background:"#009999"}} // Disable the button if already on the last page
                             >
                                 Next
                             </Button>
@@ -197,7 +200,7 @@ export default function BookTicket() {
                 ) : (
                     <div>
                         <br></br>
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
                                     <th>Airline Name</th>
@@ -216,6 +219,7 @@ export default function BookTicket() {
                             <tbody>
                                 {
                                     tickets.map((ticket) => (
+                                        
                                         <tr key={ticket.schid}>
                                             <td>{`${ticket.airlinename}`}</td>
                                             <td>{`${ticket.flightnumber}`}</td>
@@ -224,11 +228,11 @@ export default function BookTicket() {
                                             <td>{`${ticket.schdate}`}</td>
                                             <td>{`${ticket.est_arrival_time}`}</td>
                                             <td>{`${ticket.depature_time}`}</td>
-                                            <td>{`${ticket.aseats}`}</td>
-                                            <td>{`${ticket.fare}`}</td>
-                                            {ticket.aseats == 0 ? (<td><Button variant="primary" disabled="true" name={ticket.schid} id="bookBut" size="sm" onClick={bookpage}>
+                                            <td><b><i>{`First Class`}</i></b>{`-${ticket.frem}`}<br/><b><i>{`Business Class`}</i></b>{`-${ticket.brem}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${ticket.erem}`}</td>
+                                            <td><b><i>{`First Class`}</i></b>{`-${ticket.firstclass}`}<br/><b><i>{`Business Class`}</i></b>{`-${ticket.businessclass}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${ticket.economyclass}`}</td>
+                                            {ticket.aseats == 0 ? (<td><Button variant="primary" style={{background:"#009999"}} disabled="true" name={ticket.schid} id="bookBut" size="sm" onClick={bookpage}>
                                                 Book
-                                            </Button></td>) : (<td><Button variant="primary" name={ticket.schid} id="bookBut" size="sm" onClick={bookpage}>
+                                            </Button></td>) : (<td><Button variant="primary" style={{background:"#009999"}} name={ticket.schid} id="bookBut" size="sm" onClick={bookpage}>
                                                 Book
                                             </Button></td>)}
                                         </tr>

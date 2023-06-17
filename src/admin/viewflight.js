@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import baseurl from '../config';
 import { Container,Row,Col,Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
-
+import '../index.css'
 function ViewFlight() {
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
@@ -47,7 +47,9 @@ function ViewFlight() {
     const tableRows = currentItems.map((item, index) => (
         <tr key={item.fid}>
             <td>{`${item.flightnumber}`}</td>
-            <td>{`${item.capacity}`}</td>
+            <td>{`${item.focc}`}</td>
+            <td>{`${item.bocc}`}</td>
+            <td>{`${item.eocc}`}</td>
             <td>{`${item.status}`}</td>
             <td>
                 {item.status == 'removed' ? (<Button variant="warning" disabled="true" name={item.fid} id={item.fid} size="sm" onClick={removeflight}>
@@ -96,7 +98,7 @@ function ViewFlight() {
 
 
     return (
-        <div>
+        <div class='flightcont'>
             <br></br>
             <Container>
                 <Row className="justify-content-center">
@@ -112,7 +114,7 @@ function ViewFlight() {
                                     }
                                 </Form.Select>
                                 <br />
-                                <Button variant="primary" type="submit">Submit</Button>
+                                <Button variant="primary" type="submit" style={{background:"#009999"}}>Submit</Button>
                             </Form.Group>
                         </Form>
                     </Col>
@@ -125,11 +127,13 @@ function ViewFlight() {
                 ) : (
                     <div>
                         <br></br>
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
                                     <th>Flight Number</th>
-                                    <th>Capacity</th>
+                                    <th>First Class Capacity</th>
+                                    <th>Business Class Capacity</th>
+                                    <th>Economy Class Capacity</th>
                                     <th>Status</th>
                                     <th>Action</th>
 
@@ -143,14 +147,14 @@ function ViewFlight() {
                         </Table>
                         <Button
                             onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1} // Disable the button if already on the first page
+                            disabled={currentPage === 1} style={{background:"#009999"}} // Disable the button if already on the first page
                         >
                             Previous
                         </Button>
                         {currentPage}/{totalPages}
                         <Button
                             onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages} // Disable the button if already on the last page
+                            disabled={currentPage === totalPages} style={{background:"#009999"}} // Disable the button if already on the last page
                         >
                             Next
                         </Button>

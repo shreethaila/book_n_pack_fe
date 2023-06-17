@@ -5,7 +5,7 @@ import baseurl from '../config';
 import { Container, Form,Row,Col } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-
+import '../index.css'
 function ViewBooking() {
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
@@ -120,7 +120,7 @@ function ViewBooking() {
     const today = new Date();
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return (
-        <div>
+        <div class='flightcont'>
             <br></br>
             <Container>
                 <Row className="justify-content-center">
@@ -152,7 +152,7 @@ function ViewBooking() {
                                 />
                                 <br />
                                 <br />
-                                <Button variant="primary" type="submit">Submit</Button>
+                                <Button variant="primary" type="submit" style={{background:"#009999"}}>Submit</Button>
                             </Form.Group>
                         </Form>
                     </Col>
@@ -165,7 +165,7 @@ function ViewBooking() {
                 ) : (
                     <div>
                         <br></br>
-                        <Table striped bordered hover>
+                        <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
                                     <th>User Email</th>
