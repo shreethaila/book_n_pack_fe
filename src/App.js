@@ -21,7 +21,7 @@ import TicketForm from './user/ticketform';
 import AdminLogin from './admin/adminlogin';
 import AddFlight from './admin/addflight';
 import ViewFlight from './admin/viewflight';
-import ViewBooking from './admin/viewsch';
+import ViewBooking from './admin/viewbooking';
 import AddSch from './admin/addsch';
 import SignUp from './signup';
 import baseurl from './config';
@@ -31,6 +31,11 @@ import AdminSignup from './admin/adminsignup';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Addadmin from './admin/addadmin';
+import Viewsch from './admin/viewsch';
+import EditSch from './admin/editsch';
+import EditFlight from './admin/editflight';
+import AdminHome from './admin/home';
+import Profile from './user/profile';
 function App() {
   const userLoggedIn = Cookies.get('userLoggedIn');
   console.log(userLoggedIn);
@@ -58,11 +63,12 @@ function App() {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="mr-auto">
-                <Nav.Link href="/">Home</Nav.Link>
+                
                 {(() => {
                   if (userLoggedIn) {
                     return (
                       <Nav>
+                        <Nav.Link href="/">Home</Nav.Link>
                         <Nav.Link href="/book">Book Tickets</Nav.Link>
                         <Nav.Link href="/mybookings">My Bookings</Nav.Link>
                       </Nav>
@@ -70,6 +76,7 @@ function App() {
                   } else if (adminLoggedIn) {
                     return (
                       <Nav>
+                        <Nav.Link href="/adminhome">Home</Nav.Link>
                         <NavDropdown title="Flight" id="basic-nav-dropdown">
                           <NavDropdown.Item href="/addflight">Add Flight</NavDropdown.Item>
                           <NavDropdown.Item href="/viewflight">
@@ -77,7 +84,12 @@ function App() {
                           </NavDropdown.Item>
                         </NavDropdown>
                         {/* <Nav.Link href="/addflight">Add Flights</Nav.Link> */}
-                        <Nav.Link href="/addsch">Add Schedule</Nav.Link>
+                        <NavDropdown title="Travel Schedule" id="basic-nav-dropdown">
+                          <NavDropdown.Item href="/addsch">Add Schedule</NavDropdown.Item>
+                          <NavDropdown.Item href="/viewsch">
+                            View Schedule
+                          </NavDropdown.Item>
+                        </NavDropdown>
                         {/* <Nav.Link href="/viewflight">View Flights</Nav.Link> */}
                         <Nav.Link href="/viewbooking">View Booking</Nav.Link>
                         <Nav.Link href="/addadmin">Add Admin</Nav.Link>
@@ -93,7 +105,22 @@ function App() {
               {/* {!userLoggedIn ? (<Nav><NavDropdown.Item href="/login">Login/Sign up</NavDropdown.Item><NavDropdown.Item href="/adminlogin">Admin Login</NavDropdown.Item></Nav>) : (<NavDropdown.Item href="/logout">Logout</NavDropdown.Item>)}
                    */}
               {(() => {
-                if (userLoggedIn || adminLoggedIn) {
+                if (userLoggedIn) {
+                  getusername();
+                  return (
+
+                    <Navbar.Collapse className="justify-content-end">
+
+                      <NavDropdown title={<span>
+                        <FontAwesomeIcon icon={faUser}></FontAwesomeIcon>
+                        <span className="ml-2">{username}</span>
+                      </span>} id="nav-dropdown" className="ml-auto">
+                      <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
+                      <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
+                      </NavDropdown>
+                    </Navbar.Collapse>
+                  )
+                }else if (adminLoggedIn){
                   getusername();
                   return (
 
@@ -107,7 +134,8 @@ function App() {
                       </NavDropdown>
                     </Navbar.Collapse>
                   )
-                } else {
+                }
+                 else {
                   return (<div><Navbar.Collapse className="justify-content-end">
 
                     <NavDropdown title={<span>
@@ -146,6 +174,15 @@ renders the first one that matches the current URL. */}
           <Route path="verify" element={<Verify />} />
           <Route path="addadmin" element={<Addadmin />} />
           <Route path="admininvite" element={<AdminSignup />} />
+          <Route path="viewsch" element={<Viewsch />} />
+          <Route path="editsch" element={<EditSch />} />
+          <Route path="editflight" element={<EditFlight />} />
+          <Route path="adminhome" element={<AdminHome />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="*" element={<div>
+            <h1>404 NOT FOUND</h1>
+          </div>} />
+          
         </Routes>
       </div>
     </Router>

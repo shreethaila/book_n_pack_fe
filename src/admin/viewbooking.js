@@ -5,9 +5,14 @@ import baseurl from '../config';
 import { Container, Form, Row, Col } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
+import { Modal } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { ListGroup, Badge } from 'react-bootstrap';
 import Pagination from 'react-bootstrap/Pagination';
 import '../index.css'
-function ViewSch() {
+function ViewBooking() {
+
+    const [show, setShow] = useState(false);
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
     const [airline, setairline] = useState(101);
@@ -17,6 +22,23 @@ function ViewSch() {
         fid: '',
         date: ''
     });
+    const handleClose = () => setShow(false);
+    const [passenger, setpassenger] = useState([]);
+    const getpassenger = async (bid) => {
+        const response = await fetch(
+            `${baseurl}/booking/getpassengers/${bid}`,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            }
+        ).then((response) => response.json());
+        setpassenger(response.data);
+
+    }
+    const handleShow = (bid) => {
+        getpassenger(bid);
+        setShow(true);
+    }
     const getFlight = async () => {
         const response = await fetch(
             `${baseurl}/flight/getflight?aid=` + airline,
@@ -74,12 +96,13 @@ function ViewSch() {
     }
 
     const handleStDate = (date) => {
+        console.log(searchData.date)
         setSearchData({
             ...searchData,
             "date": date
         });
     }
-    const [tsch, settsch] = useState([]);
+    const [bookings, setBookings] = useState([]);
     const onSubmit = async (e) => {
         e.preventDefault();
         console.log(searchData)
@@ -87,7 +110,7 @@ function ViewSch() {
         if (searchData.date != "") {
             const date = searchData.date;
             const year = date.getFullYear();
-            const month = date.getMonth() + 1; // Months are zero-based, so add 1
+            const month = date.getMonth() + 1; 
             const day = date.getDate();
             formattedDate = year + "-" + month + "-" + day;
             console.log("formattedDate" + formattedDate);
@@ -95,112 +118,62 @@ function ViewSch() {
             formattedDate = null
         }
 
-        const response = await fetch(`${baseurl}/flight/getsch?aid=${airline}&fid=${searchData.fid}&date=${formattedDate}`, {
+        const response = await fetch(`${baseurl}/booking/getbookings?fn=${searchData.fid}&date=${formattedDate}`, {
             headers: {
                 'Content-Type': 'application/json',
             },
             credentials: 'include'
         })
             .then(response => response.json());
-        console.log(response.data);
-        settsch(response.data);
+        setBookings(response.data);
         setSearchDone(true);
     }
 
     const today = new Date();
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-    const removeschedule = async (e) => {
-        console.log("schid");
-        console.log(e.target.name);
-        await fetch(`${baseurl}/flight/removesch/${e.target.name}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include'
-        })
-            .then(response => {
-                alert("Flight Removed");
-                window.location.replace('/viewflight');
-                // let tempflights=[...flights]
-                //         // tempflights[index].status='removed';
-                //         // setflights(tempflights)
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
-    const editschedule = async (e) => {
-        await fetch(
-            `${baseurl}/booking/getbookingcountbyschid/${e.target.name}`,
-            {
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            }
-        ).then(async (response) => {
-            response = await response.json();
-            console.log("check res");
-            console.log(response.data[0].record_exists);
-            if (response.data[0].record_exists == 0) {
-                window.location.replace(`/editsch?schid=${e.target.name}`);
-            } else {
-                alert("This schedule has some bookings. Edit the schedule after cancelling it")
-            }
-        });
-        // window.location.replace(`/editsch?schid=${e.target.name}`);
-    }
-    const resultsPerPage = 10;
-    const totalResults = tsch.length;
-    const totalPages = Math.ceil(totalResults / resultsPerPage);
 
-    const [activePage, setActivePage] = React.useState(1);
+    const resultsPerPage = 10;
+    const totalResults = bookings.length; 
+    const totalPages = Math.ceil(totalResults / resultsPerPage); 
+
+    const [activePage, setActivePage] = React.useState(1); 
 
     const handlePageChange = (pageNumber) => {
-        setActivePage(pageNumber);
+        setActivePage(pageNumber); 
     };
 
     const renderResultsForPage = () => {
-
+        
         const startIndex = (activePage - 1) * resultsPerPage;
         const endIndex = startIndex + resultsPerPage;
 
+        
+        const currpage = bookings.slice(startIndex, endIndex);
 
-        const currpage = tsch.slice(startIndex, endIndex);
-
-
-        return currpage.map((sch, index) => (
-            <tr key={sch.schid}>
-                <td><img src={`${sch.logo}`} width={50} height={50} ></img><br />{`${sch.airlinename}`}</td>
-                <td>{`${sch.flightnumber}`}</td>
-                <td>{`${sch.source}`}</td>
-                <td>{`${sch.destination}`}</td>
-                <td>{`${sch.schdate}`}</td>
-                <td>{`${sch.est_arrival_time}`}</td>
-                <td>{`${sch.depature_time}`}</td>
-                <td><b><i>{`First Class`}</i></b>{`-${sch.firstclass}`}<br /><b><i>{`Business Class`}</i></b>{`-${sch.businessclass}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${sch.economyclass}`}</td>
-                {/* <td>{`${sch.businessclass}`}</td>
-                                            <td>{`${sch.economyclass}`}</td> */}
-                <td>{`${sch.status}`}</td>
-                <td>
-                    {sch.status == 'cancelled' ? (<div><Button style={{ backgroundColor: '#009999' }} disabled="true" className='button' name={sch.schid} id={sch.schid} size="sm" onClick={editschedule}>
-                        Edit
-                    </Button><Button variant="warning" className='button' disabled="true" name={sch.schid} id={sch.schid} size="sm" onClick={removeschedule}>
-                            Remove
-                        </Button></div>) : (<div><Button style={{ backgroundColor: '#009999' }} className='button' name={sch.schid} id={sch.schid} size="sm" onClick={editschedule}>
-                            Edit
-                        </Button><Button variant="warning" className='button' name={sch.schid} id={sch.schid} size="sm" onClick={removeschedule}>
-                                Remove
-                            </Button></div>)}</td>
-            </tr>
+        
+        return currpage.map((booking, index) => (
 
 
+                <tr key={booking.bid}>
+                    <td>{`${booking.email}`}</td>
+                    <td><img src={`${booking.logo}`} width={50} height={50} ></img><br />{`${booking.airlinename}`}</td>
+                    <td>{`${booking.flightnumber}`}</td>
+                    <td>{`${booking.source}`}</td>
+                    <td>{`${booking.destination}`}</td>
+                    <td>{`${booking.schdate}`}</td>
+                    <td>{`${booking.est_arrival_time}`}</td>
+                    <td>{`${booking.depature_time}`}</td>
+                    <td>{`${booking.booked_seats}`}<br /><Link onClick={() => handleShow(booking.bid)}>View Details</Link></td>
+                    <td>{`${booking.dateofbooking}`}</td>
+                    <td>{`${booking.status}`}</td>
+                </tr>
         ));
     };
 
     const items = [];
 
-
+    
     items.push(
         <Pagination.First
             key="first"
@@ -209,7 +182,7 @@ function ViewSch() {
         />
     );
 
-
+    
     items.push(
         <Pagination.Prev
             key="prev"
@@ -218,7 +191,7 @@ function ViewSch() {
         />
     );
 
-
+    
     for (let number = 1; number <= totalPages; number++) {
         items.push(
             <Pagination.Item
@@ -250,7 +223,7 @@ function ViewSch() {
         display: 'flex',
         justifyContent: 'center',
         padding: '10px',
-    };
+      };
     return (
         <div class='flightcont'>
             <br></br>
@@ -292,42 +265,76 @@ function ViewSch() {
             </Container>
 
             <div>
-                {tsch.length === 0 ? (
-                    searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No Schedules found!</h5></div>) : (<div />)
+                {bookings.length === 0 ? (
+                    searchDone ? (<div><br /><h5 style={{ textAlign: 'center' }}>No Bookings found!</h5></div>) : (<div />)
                 ) : (
                     <div>
                         <br></br>
                         <Table striped bordered hover responsive>
                             <thead>
                                 <tr>
+                                    <th>User Email</th>
                                     <th>Airline Name</th>
                                     <th>Flight Number</th>
                                     <th>Source</th>
                                     <th>Destination</th>
-                                    <th>Schedule date</th>
+                                    <th>Date</th>
                                     <th>Arrival Time</th>
                                     <th>Depature Time</th>
-                                    <th>Fare</th>
-                                    {/* <th>Business Class Fare</th>
-                                    <th>Economy Class Fare</th> */}
+                                    <th>Booked Seats</th>
+                                    <th>Date of Booking</th>
                                     <th>Status</th>
-                                    <th>Action</th>
 
                                 </tr>
                             </thead>
                             <tbody>
-                            {renderResultsForPage()}
+                        {renderResultsForPage()}
                         </tbody>
                         </Table>
                         <Pagination style={paginationStyles} className='custom-pagination'>{items}</Pagination>
                     </div>
                 )}
             </div>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Passenger Details
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
 
+                    <ListGroup as="ol" numbered>
+                        {
+                            passenger.map((p, index) => (
+                                <ListGroup.Item
+                                    as="li"
+                                    className="d-flex justify-content-between align-items-start"
+                                >
+                                    <div className="ms-2 me-auto">
+                                        <div className="fw-bold">{`${p.name}`}</div>
+                                        {`${p.age} ${p.gender}`}
+                                        <br></br>
+                                        {`${p.proof_type}: ${p.proofid}`}
+                                    </div>
+                                    <Badge style={{ background: "#009999" }}>
+                                        {`${p.seatno}`}
+                                    </Badge>
+                                </ListGroup.Item>
+                            ))
+                        }
+                    </ListGroup>
+                </Modal.Body>
+            </Modal>
 
         </div>
     )
 }
 
 
-export default ViewSch;
+export default ViewBooking;

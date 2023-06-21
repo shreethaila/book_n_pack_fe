@@ -10,54 +10,22 @@ import Col from 'react-bootstrap/Col';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Form } from 'react-bootstrap';
 import '../index.css'
-import TicketForm from './ticketform';
-import Modal from 'react-bootstrap/Modal';
+import Pagination from 'react-bootstrap/Pagination';
 export default function BookTicket() {
     const [tickets, setTickets] = useState([]);
     const [alltickets, setalltickets] = useState([]);
     const [searchDone, setSearchDone] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    
     const [searchData, setSearchData] = useState({
         source: '',
         destination: '',
         date: ''
     });
-    const itemsPerPage = 10;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = alltickets.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(alltickets.length / itemsPerPage);
-   
-
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber < 1 || pageNumber > totalPages) {
-            return; // Invalid page number, do nothing
-        }
-        setCurrentPage(pageNumber);
-    };
+    
     const bookpage = (event) => {
         window.location.replace('/ticketbook?schid=' + event.target.name);
     }
-    const tableRows = currentItems.map((item, index) => (
-        <tr key={item.schid}>
-            <td>{`${item.airlinename}`}</td>
-            <td>{`${item.flightnumber}`}</td>
-            <td>{`${item.source}`}</td>
-            <td>{`${item.destination}`}</td>
-            <td>{`${item.schdate}`}</td>
-            <td>{`${item.est_arrival_time}`}</td>
-            <td>{`${item.depature_time}`}</td>
-            <td><b><i>{`First Class`}</i></b>{`-${item.frem}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.brem}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.erem}`}</td>
-            <td><b><i>{`First Class`}</i></b>{`-${item.firstclass}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.businessclass}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.economyclass}`}</td>
-
-            {item.aseats == 0 ? (<td><Button variant="primary" disabled="true" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
-                Book
-            </Button></td>) : (<td><Button variant="primary" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
-                Book
-            </Button></td>)}
-
-        </tr>
-    ));
+    
     
     
     const getApiData = async () => {
@@ -66,7 +34,7 @@ export default function BookTicket() {
         let formattedDate;
         if (date != null) {
             const year = date.getFullYear();
-            const month = date.getMonth() + 1; // Months are zero-based, so add 1
+            const month = date.getMonth() + 1; 
             const day = date.getDate();
             formattedDate = year + "-" + month + "-" + day;
         } else {
@@ -119,12 +87,116 @@ export default function BookTicket() {
     }
     const today = new Date();
     const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+    const resultsPerPage = 10;
+    let totalResults;
+    if (tickets.length===0){
+        totalResults=alltickets.length; 
+    }else{
+        totalResults=tickets.length;
+    }
+    const totalPages = Math.ceil(totalResults / resultsPerPage); 
+
+    const [activePage, setActivePage] = React.useState(1); 
+
+    const handlePageChange = (pageNumber) => {
+        setActivePage(pageNumber); 
+    };
+
+    const renderResultsForPage = () => {
+        
+        const startIndex = (activePage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+        let currpage;
+        if (tickets.length==0){
+            currpage = alltickets.slice(startIndex, endIndex);
+        }else{
+            currpage = tickets.slice(startIndex, endIndex);
+        }
+        
+
+        
+        return currpage.map((item, index) => (
+
+
+            <tr key={item.schid}>
+            <td><img src={`${item.logo}`} width={70} height={70} ></img><br/>{`${item.airlinename}`}</td>
+            <td>{`${item.flightnumber}`}</td>
+            <td>{`${item.source}`}</td>
+            <td>{`${item.destination}`}</td>
+            <td>{`${item.schdate}`}</td>
+            <td>{`${item.est_arrival_time}`}</td>
+            <td>{`${item.depature_time}`}</td>
+            <td><b><i>{`First Class`}</i></b>{`-${item.frem}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.brem}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.erem}`}</td>
+            <td><b><i>{`First Class`}</i></b>{`-${item.firstclass}`}<br/><b><i>{`Business Class`}</i></b>{`-${item.businessclass}`} <br></br><b><i> {`Economy Class`}</i></b>{`-${item.economyclass}`}</td>
+
+            {(item.frem == 0 && item.brem==0 && item.erem==0)? (<td><Button variant="primary" disabled="true" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
+                Book
+            </Button></td>) : (<td><Button variant="primary" style={{background:"#009999"}} name={item.schid} id="bookBut" size="sm" onClick={bookpage}>
+                Book
+            </Button></td>)}
+
+        </tr>
+        ));
+    };
+
+    const items = [];
+
+    
+    items.push(
+        <Pagination.First
+            key="first"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(1)}
+        />
+    );
+
+    
+    items.push(
+        <Pagination.Prev
+            key="prev"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(activePage - 1)}
+        />
+    );
+
+    
+    for (let number = 1; number <= totalPages; number++) {
+        items.push(
+            <Pagination.Item
+                key={number}
+                active={number === activePage}
+                onClick={() => handlePageChange(number)}
+            >
+                {number}
+            </Pagination.Item>
+        );
+    }
+
+    items.push(
+        <Pagination.Next
+            key="next"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(activePage + 1)}
+        />
+    );
+
+    items.push(
+        <Pagination.Last
+            key="last"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(totalPages)}
+        />
+    );
+    const paginationStyles = {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '10px',
+      };
     return (
         <div class='cont'>
             <br>
             </br>
-
-
 
             <Form onSubmit={handlesubmit}>
                 <Form.Group>
@@ -176,25 +248,11 @@ export default function BookTicket() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {
-                                        tableRows
-                                    }
-                                </tbody>
-                            </Table>
-                            <Button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1} style={{background:"#009999"}} // Disable the button if already on the first page
-                            >
-                                Previous
-                            </Button>
-                            {currentPage}/{totalPages}
-                            <Button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                                style={{background:"#009999"}} // Disable the button if already on the last page
-                            >
-                                Next
-                            </Button>
+                                {renderResultsForPage()}
+                        </tbody>
+                        </Table>
+                        <Pagination style={paginationStyles} className='custom-pagination'>{items}</Pagination>
+                            
                         </div>
                     )
                 ) : (
@@ -217,11 +275,11 @@ export default function BookTicket() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
+                                {/* {
                                     tickets.map((ticket) => (
                                         
                                         <tr key={ticket.schid}>
-                                            <td>{`${ticket.airlinename}`}</td>
+                                            <td><img src={`${ticket.logo}`} width={50} height={50} ></img><br/>{`${ticket.airlinename}`}</td>
                                             <td>{`${ticket.flightnumber}`}</td>
                                             <td>{`${ticket.source}`}</td>
                                             <td>{`${ticket.destination}`}</td>
@@ -237,9 +295,11 @@ export default function BookTicket() {
                                             </Button></td>)}
                                         </tr>
                                     ))
-                                }
-                            </tbody>
+                                } */}
+                            {renderResultsForPage()}
+                        </tbody>
                         </Table>
+                        <Pagination style={paginationStyles} className='custom-pagination'>{items}</Pagination>
                     </div>
                 )}
             </div>

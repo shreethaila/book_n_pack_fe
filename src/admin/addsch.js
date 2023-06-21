@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Form,Row,Col,Container } from 'react-bootstrap';
 import baseurl from '../config';
 import Button from 'react-bootstrap/Button';
-import TimePicker from 'react-time-picker';
 import DatePicker from 'react-datepicker';
 import '../index.css'
 function AddSch() {
@@ -117,7 +116,6 @@ function AddSch() {
             <option key={index} value={flight.fid}>{`${flight.flightnumber}`}</option>
         ));
     }
-    const [selectedTime, setSelectedTime] = useState('10:10');
 
     const handleEndDate = (date) => {
         console.log(date)
@@ -148,7 +146,7 @@ function AddSch() {
                 <Col xs={12} sm={8} md={6} lg={4}>
                     <Form onSubmit={submitSch}>
                         <Form.Group>
-                            <Form.Label>Airline</Form.Label>
+                            <Form.Label>Airline<span className="required">*</span></Form.Label>
                             <Form.Select name='aid' onChange={handleAirlineChange} required>
                                 {
                                     allAirline.map((airline) => (
@@ -157,18 +155,18 @@ function AddSch() {
                                 }
                             </Form.Select>
                             <br />
-                            <Form.Label>Flight Number</Form.Label>
+                            <Form.Label>Flight Number<span className="required">*</span></Form.Label>
                             <Form.Select name='fid' onChange={handleChange} required>
                                 {getflights()}
                             </Form.Select>
                             <br />
-                            <Form.Label>Source</Form.Label>
+                            <Form.Label>Source<span className="required">*</span></Form.Label>
                             <Form.Control type="text" placeholder="Source" name="source" value={schData.source} onChange={handleChange} required />
                             <br />
-                            <Form.Label>Destination</Form.Label>
+                            <Form.Label>Destination<span className="required">*</span></Form.Label>
                             <Form.Control type="text" placeholder="Destination" name="destination" value={schData.destination} onChange={handleChange} required />
                             <br />
-                            <Form.Label>Estimated Arrival Time</Form.Label>
+                            <Form.Label>Estimated Arrival Time<span className="required">*</span></Form.Label>
                             <Form.Control
                                 type="time"
                                 value={schData.est_arrival_time}
@@ -177,7 +175,7 @@ function AddSch() {
                                 required
                             />
                             <br />
-                            <Form.Label>Depature Time</Form.Label>
+                            <Form.Label>Depature Time<span className="required">*</span></Form.Label>
                             <Form.Control
                                 type="time"
                                 value={schData.depature_time}
@@ -186,16 +184,16 @@ function AddSch() {
                                 required
                             />
                             <br />
-                            <Form.Label>First Class Fare</Form.Label>
+                            <Form.Label>First Class Fare<span className="required">*</span></Form.Label>
                             <Form.Control type="number" placeholder="Fare" name="firstclass" min="0" value={schData.firstclass} onChange={handleChange} required />
                             <br />
-                            <Form.Label>Business Class Fare</Form.Label>
+                            <Form.Label>Business Class Fare<span className="required">*</span></Form.Label>
                             <Form.Control type="number" placeholder="Fare" name="businessclass" min="0" value={schData.businessclass} onChange={handleChange} required />
                             <br/>
-                            <Form.Label>Economy Class Fare</Form.Label>
+                            <Form.Label>Economy Class Fare<span className="required">*</span></Form.Label>
                             <Form.Control type="number" placeholder="Fare" name="economyclass" min="0" value={schData.economyclass} onChange={handleChange} required />
                             <br/>
-                            <Form.Label>Starts From</Form.Label>
+                            <Form.Label>Starts From<span className="required">*</span></Form.Label>
                             <DatePicker
                                 minDate={minDate}
                                 selected={schData.stdate}
@@ -206,7 +204,8 @@ function AddSch() {
                                 required
                             />
                             <br />
-                            <Form.Label>Runs upto</Form.Label>
+                            <br/>
+                            <Form.Label>Runs upto<span className="required">*</span></Form.Label>
                             <DatePicker
                                 minDate={minDate}
                                 selected={schData.enddate}

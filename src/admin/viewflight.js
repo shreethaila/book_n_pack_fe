@@ -2,28 +2,16 @@ import React from 'react';
 import Table from 'react-bootstrap/Table';
 import { useEffect, useState } from 'react';
 import baseurl from '../config';
-import { Container,Row,Col,Form } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import '../index.css'
+import Pagination from 'react-bootstrap/Pagination';
 function ViewFlight() {
     const [flights, setflights] = useState([]);
     const [allAirline, setallAirline] = useState([]);
     const [airline, setairline] = useState(1);
     const [searchDone, setSearchDone] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = flights.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(flights.length / itemsPerPage);
 
-
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber < 1 || pageNumber > totalPages) {
-            return; // Invalid page number, do nothing
-        }
-        setCurrentPage(pageNumber);
-    };
     const removeflight = (e) => {
 
         fetch(`${baseurl}/flight/remove/${e.target.name}`, {
@@ -44,23 +32,25 @@ function ViewFlight() {
                 console.error(error);
             });
     }
-    const tableRows = currentItems.map((item, index) => (
-        <tr key={item.fid}>
-            <td>{`${item.flightnumber}`}</td>
-            <td>{`${item.focc}`}</td>
-            <td>{`${item.bocc}`}</td>
-            <td>{`${item.eocc}`}</td>
-            <td>{`${item.status}`}</td>
-            <td>
-                {item.status == 'removed' ? (<Button variant="warning" disabled="true" name={item.fid} id={item.fid} size="sm" onClick={removeflight}>
-                    Remove
-                </Button>) : (<Button variant="warning" name={item.fid} id={item.fid} size="sm" onClick={removeflight}>
-                    Remove
-                </Button>)}</td>
-
-
-        </tr>
-    ));
+    const editflight = async (e) => {
+        await fetch(
+            `${baseurl}/booking/getbookingcountbyfid/${e.target.name}`,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            }
+        ).then(async (response) => {
+            response = await response.json();
+            console.log("check res");
+            console.log(response.data[0].record_exists);
+            if (response.data[0].record_exists == 0) {
+                window.location.replace(`/editflight?fid=${e.target.name}`);
+            } else {
+                alert("This flight has some bookings. Edit the flight after cancelling it")
+            }
+        });
+    }
+    
     const getFlight = async () => {
         const response = await fetch(
             `${baseurl}/flight/getflight?aid=` + airline,
@@ -90,11 +80,106 @@ function ViewFlight() {
     }, []);
     const submitSch = (e) => {
         e.preventDefault();
-        setCurrentPage(1)
         getFlight();
         setSearchDone(true)
     }
+    const resultsPerPage = 10;
+    const totalResults = flights.length;
+    const totalPages = Math.ceil(totalResults / resultsPerPage);
 
+    const [activePage, setActivePage] = React.useState(1);
+
+    const handlePageChange = (pageNumber) => {
+        setActivePage(pageNumber);
+    };
+
+    const renderResultsForPage = () => {
+
+        const startIndex = (activePage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+
+
+        const currpage = flights.slice(startIndex, endIndex);
+
+
+        return currpage.map((item, index) => (
+
+            <tr key={item.fid}>
+                <td>{`${item.flightnumber}`}</td>
+                <td>{`${item.focc}`}</td>
+                <td>{`${item.bocc}`}</td>
+                <td>{`${item.eocc}`}</td>
+                <td>{`${item.status}`}</td>
+                <td>
+                    {item.status == 'removed' ? (<div><Button style={{ backgroundColor: '#009999' }} disabled="true" className='button' name={item.fid} id={item.fid} size="sm" onClick={editflight}>
+                        Edit
+                    </Button><Button variant="warning" className='button' disabled="true" name={item.fid} id={item.fid} size="sm" onClick={removeflight}>
+                            Remove
+                        </Button></div>) : (<div><Button style={{ backgroundColor: '#009999' }} className='button' name={item.fid} id={item.fid} size="sm" onClick={editflight}>
+                            Edit
+                        </Button><Button variant="warning" className='button' name={item.fid} id={item.fid} size="sm" onClick={removeflight}>
+                                Remove
+                            </Button></div>)}</td>
+
+
+            </tr>
+
+        ));
+    };
+
+    const items = [];
+
+
+    items.push(
+        <Pagination.First
+            key="first"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(1)}
+        />
+    );
+
+
+    items.push(
+        <Pagination.Prev
+            key="prev"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(activePage - 1)}
+        />
+    );
+
+
+    for (let number = 1; number <= totalPages; number++) {
+        items.push(
+            <Pagination.Item
+                key={number}
+                active={number === activePage}
+                onClick={() => handlePageChange(number)}
+            >
+                {number}
+            </Pagination.Item>
+        );
+    }
+
+    items.push(
+        <Pagination.Next
+            key="next"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(activePage + 1)}
+        />
+    );
+
+    items.push(
+        <Pagination.Last
+            key="last"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(totalPages)}
+        />
+    );
+    const paginationStyles = {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '10px',
+    };
 
 
     return (
@@ -114,7 +199,7 @@ function ViewFlight() {
                                     }
                                 </Form.Select>
                                 <br />
-                                <Button variant="primary" type="submit" style={{background:"#009999"}}>Submit</Button>
+                                <Button variant="primary" type="submit" style={{ background: "#009999" }}>Submit</Button>
                             </Form.Group>
                         </Form>
                     </Col>
@@ -140,24 +225,11 @@ function ViewFlight() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {
-                                    tableRows
-                                }
+                                {renderResultsForPage()}
                             </tbody>
                         </Table>
-                        <Button
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1} style={{background:"#009999"}} // Disable the button if already on the first page
-                        >
-                            Previous
-                        </Button>
-                        {currentPage}/{totalPages}
-                        <Button
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages} style={{background:"#009999"}} // Disable the button if already on the last page
-                        >
-                            Next
-                        </Button>
+                        <Pagination style={paginationStyles} className='custom-pagination'>{items}</Pagination>
+
                     </div>
                 )}
             </div>

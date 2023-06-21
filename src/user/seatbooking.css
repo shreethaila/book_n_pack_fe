@@ -1,0 +1,43 @@
+
+  
+  .seat-picker {
+    margin: auto;
+  }
+  
+  .seat-picker__row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .seat-picker__row__number {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+  .seat-picker__row__seats {
+    display: flex;
+  }
+  
+  .seat {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #def8f8;
+    cursor: pointer;
+    border: 1px solid #ccc; 
+  }
+  
+  .seat--reserved {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+  
+  .seat--selected {
+    background-color: #009999;
+  }
+  
+  

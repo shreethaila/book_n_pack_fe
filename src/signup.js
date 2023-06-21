@@ -131,7 +131,7 @@ function SignUp() {
         padding: '10px' }}>
         <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
-        <Form.Label>First Name</Form.Label>
+        <Form.Label>First Name<span className="required">*</span></Form.Label>
         <Col sm="12">
         <Form.Control type="text" placeholder="First Name" name="fname" value={signUpValues.fname} onChange={handleChange} isInvalid={formFailure.fname} />
         <Form.Control.Feedback type="invalid">
@@ -144,7 +144,7 @@ function SignUp() {
         <Form.Control type="text" placeholder="Last Name" name="lname" value={signUpValues.lname} onChange={handleChange} />
         </Col>
         <br></br>
-        <Form.Label>Email address</Form.Label>
+        <Form.Label>Email address<span className="required">*</span></Form.Label>
         <Col sm="12">
         <Form.Control type="email" placeholder="name@example.com" name="email" value={signUpValues.email} onChange={handleChange} isInvalid={formFailure.email} />
         <Form.Control.Feedback type="invalid">
@@ -153,7 +153,7 @@ function SignUp() {
         </Form.Control.Feedback>
         </Col>
         <br></br>
-        <Form.Label>Password</Form.Label>
+        <Form.Label>Password<span className="required">*</span></Form.Label>
         <Col sm="12">
         <Form.Control type="password" placeholder="Enter Password" name="password" value={signUpValues.password} onChange={handleChange} isInvalid={formFailure.password} />
         <Form.Control.Feedback type="invalid">
@@ -161,7 +161,7 @@ function SignUp() {
         </Form.Control.Feedback>
         </Col>
         <br></br>
-        <Form.Label>Confirm Password</Form.Label>
+        <Form.Label>Confirm Password<span className="required">*</span></Form.Label>
         <Col sm="12">
         <Form.Control type="password" placeholder="Confirm Password" name="conPassword" value={signUpValues.conPassword}
           isInvalid={formFailure.conPassword} onChange={handleChange} />
@@ -170,7 +170,7 @@ function SignUp() {
         </Form.Control.Feedback>
         </Col>
         <br></br>
-        <Form.Label>Phone Number</Form.Label>
+        <Form.Label>Phone Number<span className="required">*</span></Form.Label>
         <Col sm="12">
         <Form.Control type="text" placeholder="Phone Number" name="phoneno" value={signUpValues.phoneno} onChange={handleChange} isInvalid={formFailure.phoneno} />
         <Form.Control.Feedback type="invalid">
@@ -178,9 +178,9 @@ function SignUp() {
         </Form.Control.Feedback>
         </Col>
         <br></br>
-        <Form.Label>Address</Form.Label>
+        <Form.Label>Address<span className="required">*</span></Form.Label>
         <Col sm="12">
-        <Form.Control as="textarea" name="address" onChange={handleChange} value={signUpValues.address} rows={3} isInvalid={formFailure.address} />
+        <Form.Control as="textarea" placeholder="Address" name="address" onChange={handleChange} value={signUpValues.address} rows={3} isInvalid={formFailure.address} />
         <Form.Control.Feedback type="invalid">
           {formFailure.address}
         </Form.Control.Feedback>

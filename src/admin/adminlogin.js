@@ -35,7 +35,7 @@ const Login = () => {
                 body: JSON.stringify(loginData)
             }).then(response => {
                 console.log("Logged In successfully!!")
-                window.location.replace('/')
+                window.location.replace('/adminhome')
             });
 
         }

@@ -65,7 +65,44 @@ code {
   width: 100%;
 }
 
+.caption{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(80, 75, 75, 0.486);
+  color: #fff;
+  padding: 10px;
+}
 
+
+.button {
+  margin-right: 10px;
+}
+
+.custom-pagination .page-link {
+  color: #009999; 
+}
+
+.custom-pagination .page-link:hover {
+  background-color: #def8f8; 
+  color: #009999; 
+}
+
+.custom-pagination .page-item.active .page-link {
+  background-color: #009999; 
+  color: #ffffff; 
+}
+
+Pagination {
+  display: 'flex';
+       justify-content : 'center';
+        padding: '10px',
+}
+
+.required {
+  color: red;
+  margin-left: 5px;
+}
 
 
 

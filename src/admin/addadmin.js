@@ -45,7 +45,7 @@ function Addadmin() {
                     <br />
                     <Form onSubmit={submit}>
                         <Form.Group>
-                            <Form.Label>First Name</Form.Label>
+                            <Form.Label>First Name<span className="required">*</span></Form.Label>
                             <Form.Control
                                 name='fname'
                                 type="text"
@@ -64,7 +64,7 @@ function Addadmin() {
                                 placeholder="Enter Last Name"
                             />
                             <br></br>
-                            <Form.Label>Email</Form.Label>
+                            <Form.Label>Email<span className="required">*</span></Form.Label>
                             <Form.Control
                                 name='email'
                                 type="email"

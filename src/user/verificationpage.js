@@ -1,4 +1,4 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import baseurl from "../config";
 import verifiedgif from '../verifiedgif.gif'
 import sorry from '../sorry.gif'
@@ -34,7 +34,7 @@ function Verify() {
     return (
         <div>
             {
-                ((verified) ? (<div className="image-container"><img src={verifiedgif} className="aligned-image"/><br/><Button href="/login" style={{backgroundColor:'#009999'}}>Login</Button></div>) : (<div className="image-container"><img src={sorry} className="aligned-image"/><br/><h5>Invalid Request</h5></div>))
+                ((verified) ? (<div className="image-container"><img src={verifiedgif} className="aligned-image" /><br /><Button href="/login" style={{ backgroundColor: '#009999' }}>Login</Button></div>) : (<div className="image-container"><img src={sorry} className="aligned-image" /><br /><h5>Invalid Request</h5></div>))
             }
         </div>
     )

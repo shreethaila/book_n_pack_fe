@@ -10,10 +10,13 @@ import Book from './user/book'
 import Addflight from './admin/addflight';
 import reportWebVitals from './reportWebVitals';
 import Home from './user/home'
+import Seat from './user/seat'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Profile from './user/profile'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <App/>
+    //  <Seat/>
   
 );
 

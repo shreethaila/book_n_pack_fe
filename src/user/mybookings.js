@@ -6,18 +6,14 @@ import baseurl from '../config';
 import { Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ListGroup, Badge } from 'react-bootstrap';
+import Pagination from 'react-bootstrap/Pagination';
 import '../index.css'
 export default function Mybookings() {
     const [show, setShow] = useState(false);
     const currentDate = new Date();
     const currentDateString = currentDate.toISOString().split('T')[0];
     const [bookings, setBookings] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = bookings.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(bookings.length / itemsPerPage);
+    
     const handleClose = () => setShow(false);
     const [passenger, setpassenger] = useState([]);
     const getpassenger = async (bid) => {
@@ -50,16 +46,45 @@ export default function Mybookings() {
         window.location.replace('/mybookings')
 
     }
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber < 1 || pageNumber > totalPages) {
-            return; // Invalid page number, do nothing
-        }
-        setCurrentPage(pageNumber);
+    
+    
+    const getApiData = async () => {
+        const response = await fetch(
+            `${baseurl}/booking`,
+            {
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            }
+        ).then((response) => response.json());
+        setBookings(response.data);
     };
-    const tableRows = currentItems.map((item, index) => (
-        <tr key={index}>
+    useEffect(() => {
+        getApiData();
+    }, []);
+    const resultsPerPage = 10;
+    const totalResults = bookings.length; 
+    const totalPages = Math.ceil(totalResults / resultsPerPage); 
 
-            <td>{`${item.airlinename}`}</td>
+    const [activePage, setActivePage] = React.useState(1); 
+
+    const handlePageChange = (pageNumber) => {
+        setActivePage(pageNumber); 
+    };
+
+    const renderResultsForPage = () => {
+        
+        const startIndex = (activePage - 1) * resultsPerPage;
+        const endIndex = startIndex + resultsPerPage;
+
+        
+        const currpage = bookings.slice(startIndex, endIndex);
+
+        
+        return currpage.map((item, index) => (
+
+            <tr key={index}>
+
+            <td><img src={`${item.logo}`} width={50} height={50} ></img><br/>{`${item.airlinename}`}</td>
             <td>{`${item.flightnumber}`}</td>
             <td>{`${item.source}`}</td>
             <td>{`${item.destination}`}</td>
@@ -83,20 +108,63 @@ export default function Mybookings() {
                 </Button></td>))}
 
         </tr>
-    ));
-    const getApiData = async () => {
-        const response = await fetch(
-            `${baseurl}/booking`,
-            {
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            }
-        ).then((response) => response.json());
-        setBookings(response.data);
+                
+        ));
     };
-    useEffect(() => {
-        getApiData();
-    }, []);
+
+    const items = [];
+
+    
+    items.push(
+        <Pagination.First
+            key="first"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(1)}
+        />
+    );
+
+    
+    items.push(
+        <Pagination.Prev
+            key="prev"
+            disabled={activePage === 1}
+            onClick={() => handlePageChange(activePage - 1)}
+        />
+    );
+
+    
+    for (let number = 1; number <= totalPages; number++) {
+        items.push(
+            <Pagination.Item
+                key={number}
+                active={number === activePage}
+                onClick={() => handlePageChange(number)}
+            >
+                {number}
+            </Pagination.Item>
+        );
+    }
+
+    items.push(
+        <Pagination.Next
+            key="next"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(activePage + 1)}
+        />
+    );
+
+    items.push(
+        <Pagination.Last
+            key="last"
+            disabled={activePage === totalPages}
+            onClick={() => handlePageChange(totalPages)}
+        />
+    );
+    const paginationStyles = {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '10px',
+      };
 
     return (
         <div class='cont'>
@@ -125,25 +193,11 @@ export default function Mybookings() {
                             </tr>
                         </thead>
                         <tbody>
-                            {tableRows}
+                        {renderResultsForPage()}
                         </tbody>
-                    </Table>
-                    <div>
-                        <Button
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1} style={{ background: "#009999" }}// Disable the button if already on the first page
-                        >
-                            Previous
-                        </Button>
-                        {currentPage}/{totalPages}
-                        <Button
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
-                            style={{ background: "#009999" }}// Disable the button if already on the last page
-                        >
-                            Next
-                        </Button>
-                    </div>
+                        </Table>
+                        <Pagination style={paginationStyles} className='custom-pagination'>{items}</Pagination>
+                    
 
                 </div>
             )

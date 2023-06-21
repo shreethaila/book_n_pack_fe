@@ -6,7 +6,6 @@ import { Form,Row,Col,Container } from "react-bootstrap";
 import '../index.css'
 function AdminSignup() {
     const [formFailure, setFormFailure] = useState('');
-    const [uid,setuid]=useState('');
     const [signUpValues, setSignUpValues] = useState(
         {
             uid:'',
@@ -126,7 +125,6 @@ function AdminSignup() {
         ).then((response) => response.json());
         if (response.data.length > 0) {
             setverified(true)
-            setuid(response.data[0].uid);
             signUpValues.uid=response.data[0].uid;
             signUpValues.fname=response.data[0].fname;
             signUpValues.lname=response.data[0].lname;
